@@ -1,0 +1,556 @@
+{
+  "$schema": "https://developers.openai.com/apps-sdk/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "Riveter",
+    "subtitle": "Enrich and research data",
+    "description": "Riveter helps users enrich tabular data, build targeted datasets, run web searches and scrapes, extract structured records, and schedule recurring monitors from ChatGPT.",
+    "category": "BUSINESS"
+  },
+  "tools": {
+    "enrich": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Starts an enrichment run that fills cells on a dataset or on inline rows, consumes credits, and may create configuration records in the user's Riveter account.",
+        "open_world_justification": "Runs AI agents that search and read the public web to fill each cell, and can POST completed results to a caller-supplied webhook URL.",
+        "destructive_justification": "Writes new cell values and run data without deleting rows, columns, or the saved enrichment configuration."
+      }
+    },
+    "get_run": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves the current status and metadata of an existing run.",
+        "open_world_justification": "Does not write to public internet state or any third-party system.",
+        "destructive_justification": "Does not delete, overwrite, stop, or otherwise modify the run."
+      }
+    },
+    "get_run_result": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Retrieves an existing run's status and available output, with an optional read-only long poll.",
+        "open_world_justification": "Does not publish or transmit results to an external system.",
+        "destructive_justification": "Does not alter the run or its stored results."
+      }
+    },
+    "stop_run": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Changes a running Riveter job to a stopped state.",
+        "open_world_justification": "Only changes the run inside the user's private Riveter account.",
+        "destructive_justification": "Stops the selected run, and the run cannot be resumed afterward."
+      }
+    },
+    "list_runs": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists runs and applies read-only filters and pagination.",
+        "open_world_justification": "Does not change public or third-party systems.",
+        "destructive_justification": "Does not modify or remove any listed run."
+      }
+    },
+    "runs_summary": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves aggregate run counts by status for the authenticated account.",
+        "open_world_justification": "Does not write to any external or publicly visible system.",
+        "destructive_justification": "Does not change the runs included in the summary."
+      }
+    },
+    "list_enrichments": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists saved enrichments and their visible configuration metadata.",
+        "open_world_justification": "Does not affect systems outside the user's Riveter account.",
+        "destructive_justification": "Does not add, update, rename, or delete enrichment columns."
+      }
+    },
+    "create_enrichment": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Saves a new enrichment configuration (task prompt and output columns) and the empty dataset bound to it, or answers a dataset's own enrichment; it does not run anything.",
+        "open_world_justification": "Creates records only inside the user's private Riveter account; fetches no web page and contacts no external system.",
+        "destructive_justification": "Creates new resources without deleting or overwriting an existing enrichment or dataset."
+      }
+    },
+    "get_enrichment": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves the structure and configuration of a saved enrichment.",
+        "open_world_justification": "Does not write to public or third-party systems.",
+        "destructive_justification": "Does not change the enrichment or its columns."
+      }
+    },
+    "update_enrichment": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Adds, updates, renames, deletes, or reorders columns in a saved enrichment.",
+        "open_world_justification": "Only changes configuration inside the user's private Riveter account.",
+        "destructive_justification": "Can delete columns or overwrite existing column configuration and ordering."
+      }
+    },
+    "delete_enrichment": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Deletes a saved enrichment configuration from the user's Riveter account.",
+        "open_world_justification": "Acts only on a record inside the user's private Riveter account; contacts no external system.",
+        "destructive_justification": "Permanently removes the enrichment and its column configuration; the deletion cannot be undone."
+      }
+    },
+    "build_dataset": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a new dataset in the user's account from rows the caller sends, or starts a billable build run that generates rows from a description and can optionally start a fill run.",
+        "open_world_justification": "Generating rows researches the public web, and the call can POST completed build or fill results to caller-supplied webhook URLs.",
+        "destructive_justification": "Creates a new dataset and runs without deleting or overwriting an existing dataset."
+      }
+    },
+    "list_datasets": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists the datasets in the authenticated account with their column and row counts.",
+        "open_world_justification": "Reads from the user's own Riveter account only; contacts no external system.",
+        "destructive_justification": "Does not modify or remove any listed dataset."
+      }
+    },
+    "get_dataset": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves one dataset's columns, row count, bound enrichment id, and recent runs.",
+        "open_world_justification": "Reads from the user's own Riveter account only; contacts no external system.",
+        "destructive_justification": "Does not change the dataset, its rows, or its columns."
+      }
+    },
+    "update_dataset": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Renames the dataset, changes its index column, adds, renames, or removes input and output columns, and sets the per-row budget on its enrichment.",
+        "open_world_justification": "Only changes configuration inside the user's private Riveter account; contacts no external system.",
+        "destructive_justification": "Removing a column deletes every value stored under it, and a changed prompt marks the column's cells stale; neither is recoverable."
+      }
+    },
+    "delete_dataset": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Deletes a dataset and every row and cell it holds from the user's Riveter account.",
+        "open_world_justification": "Acts only on records inside the user's private Riveter account; contacts no external system.",
+        "destructive_justification": "Permanently removes the dataset, its rows, and its cells; the deletion cannot be undone."
+      }
+    },
+    "list_dataset_rows": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists a dataset's rows with their input values and cell values, with read-only cursor pagination.",
+        "open_world_justification": "Reads from the user's own Riveter account only; contacts no external system.",
+        "destructive_justification": "Does not modify or remove any listed row."
+      }
+    },
+    "add_dataset_rows": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Appends rows the caller sends to a dataset in the user's account; no credits are consumed.",
+        "open_world_justification": "Writes only inside the user's private Riveter account; fetches no web page and contacts no external system.",
+        "destructive_justification": "Append-only: existing rows and cells are never removed or overwritten, and duplicate rows are skipped."
+      }
+    },
+    "delete_dataset_rows": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Deletes up to 100 rows, named by id or position, from a dataset in the user's account.",
+        "open_world_justification": "Acts only on records inside the user's private Riveter account; contacts no external system.",
+        "destructive_justification": "Permanently removes the named rows and their cell values; the deletion cannot be undone."
+      }
+    },
+    "import_dataset_rows": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Appends the rows of a caller-supplied CSV to a dataset in the user's account; no credits are consumed.",
+        "open_world_justification": "Writes only inside the user's private Riveter account; fetches no web page and contacts no external system.",
+        "destructive_justification": "Append-only: existing rows and cells are never removed or overwritten, and duplicate rows are skipped."
+      }
+    },
+    "build_dataset_rows": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Starts a billable build run that generates additional rows for an existing dataset and can optionally start a fill run.",
+        "open_world_justification": "Researches the public web to generate the rows, and can POST completed build or fill results to caller-supplied webhook URLs.",
+        "destructive_justification": "Append-only: existing rows and cells are never removed or overwritten, and duplicate rows are skipped."
+      }
+    },
+    "update_dataset_row": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Sets one row's input values and output cells by hand in the user's account.",
+        "open_world_justification": "Writes only inside the user's private Riveter account; contacts no external system.",
+        "destructive_justification": "Overwrites the row's existing input values and cell values, and a null clears a cell; the previous values are not recoverable."
+      }
+    },
+    "promote_dataset_column": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Converts an output column of a dataset into an input column, moving every row's value with it.",
+        "open_world_justification": "Only changes configuration and stored values inside the user's private Riveter account.",
+        "destructive_justification": "Removes the output column and its prompt from the enrichment; the column's configuration is not recoverable, although the values are kept as input values."
+      }
+    },
+    "export_dataset": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only renders the dataset's rows and cells as a CSV, Excel, or JSON Lines file.",
+        "open_world_justification": "Reads from the user's own Riveter account only; contacts no external system.",
+        "destructive_justification": "Does not change the dataset, its rows, or its columns."
+      }
+    },
+    "build_configured_dataset": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Starts a billable dataset-build run from a configured template in the user's account.",
+        "open_world_justification": "Can POST completed dataset results to a caller-supplied webhook URL.",
+        "destructive_justification": "Creates a new build without modifying or deleting the configured template."
+      }
+    },
+    "run_extraction": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Starts a billable run of an existing extraction plan and stores the resulting run record.",
+        "open_world_justification": "Can POST extracted records to a caller-supplied webhook URL.",
+        "destructive_justification": "Creates a new run without deleting or overwriting the extraction plan."
+      }
+    },
+    "create_extraction": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a persistent extraction plan, starts discovery, and applies the plan's service credit charge.",
+        "open_world_justification": "Fetches arbitrary public web pages at the caller-supplied URL to plan the extraction. It interacts with external websites outside Riveter, though it only reads them.",
+        "destructive_justification": "Creates a new plan without deleting or overwriting an existing plan."
+      }
+    },
+    "get_extraction": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves an extraction plan's lifecycle state and user-facing definition.",
+        "open_world_justification": "Does not change the plan's source website or any third-party system.",
+        "destructive_justification": "Does not run, modify, or delete the extraction plan."
+      }
+    },
+    "list_monitors": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists monitor schedules belonging to the authenticated account.",
+        "open_world_justification": "Does not send monitor results or modify external systems.",
+        "destructive_justification": "Does not create, pause, resume, or repoint any monitor."
+      }
+    },
+    "create_monitor": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a recurring monitor schedule and can optionally start its first enrichment run immediately.",
+        "open_world_justification": "Can send scheduled monitor results or change alerts to a caller-supplied webhook URL.",
+        "destructive_justification": "Creates a new schedule without deleting or overwriting the underlying enrichment."
+      }
+    },
+    "get_monitor": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves the selected monitor's schedule, state, and delivery configuration.",
+        "open_world_justification": "Does not run the monitor or send results to its webhook.",
+        "destructive_justification": "Does not pause, resume, repoint, or delete the monitor."
+      }
+    },
+    "update_monitor": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Changes whether a monitor is enabled or replaces its webhook delivery URL.",
+        "open_world_justification": "Can repoint future monitor results to a caller-supplied external webhook URL.",
+        "destructive_justification": "Pause, resume, and webhook changes are reversible and do not delete the monitor."
+      }
+    },
+    "list_monitor_runs": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists historical runs for the selected monitor with optional filters and pagination.",
+        "open_world_justification": "Does not execute the monitor or contact its webhook.",
+        "destructive_justification": "Does not modify the monitor or any listed run."
+      }
+    },
+    "quick_search": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Runs a web search, consumes service credits, and persists a run and its results in the user's account.",
+        "open_world_justification": "Web search: queries the open internet and returns results from arbitrary external websites. Read-only toward those sites, but the domain of interaction is the public web, not a closed system.",
+        "destructive_justification": "Creates a search record without deleting or overwriting account data."
+      }
+    },
+    "search_agent": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Starts an agent run, consumes service credits, and stores the answer in the user's Riveter account.",
+        "open_world_justification": "An agent that searches and browses arbitrary public websites to answer the prompt. It interacts with the open web; it only reads pages and does not post, submit forms, or message anyone.",
+        "destructive_justification": "Creates a new run without deleting or overwriting existing account resources."
+      }
+    },
+    "scrape": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Performs a scrape, consumes service credits, and creates a run record in the user's account.",
+        "open_world_justification": "Fetches the caller-supplied URL from the public internet and returns its text. It interacts with an arbitrary external website, though it only reads it and changes nothing there.",
+        "destructive_justification": "Creates scrape results without deleting or overwriting user resources."
+      }
+    },
+    "get_account": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only retrieves plan, credit balance, account identity, and API key metadata for the authenticated account.",
+        "open_world_justification": "Does not transmit data to or change any public or third-party system.",
+        "destructive_justification": "Does not modify account, billing, or API key settings."
+      }
+    },
+    "list_tools": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only lists the research tools an enrichment may use, with their prices and whether the account may use each.",
+        "open_world_justification": "Reads from the user's own Riveter account only; contacts no external system.",
+        "destructive_justification": "Does not change any tool setting, enrichment, or account configuration."
+      }
+    },
+    "help": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only returns reference text about how to use the other tools; it calls no API and reads no account data.",
+        "open_world_justification": "Returns static documentation bundled with the tool catalog; contacts no external system.",
+        "destructive_justification": "Returns documentation only; cannot modify or delete anything."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Run a saved enrichment and retrieve its completed row-level results.",
+      "user_prompt": "List my enrichments, use the demo enrichment named Company Research to enrich Apple and Stripe, wait for the run to finish, and show me the results.",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_enrichments, enrich, get_run, get_run_result",
+      "expected_output": "Finds the named demo enrichment, starts one enrichment run with matching input columns, and returns its completed results or a clear terminal status.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Build a targeted dataset from a natural-language specification and retrieve its rows.",
+      "user_prompt": "Build a dataset of 10 US-based B2B SaaS companies founded since 2020, including each company's website and headquarters city, then wait for the rows and show them to me.",
+      "file_attachment_urls": null,
+      "tools_triggered": "build_dataset, get_run, get_run_result, list_dataset_rows",
+      "expected_output": "Starts a dataset-build run using the requested row count and constraints, then reads the new dataset's rows and returns up to 10 structured company rows when the run completes.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Put rows the user has into a dataset, fill two columns on them, and read the grid back.",
+      "user_prompt": "Make a dataset with the companies Apple, Stripe, and Shopify, add columns for the CEO and the headquarters city, fill them in, and show me the table.",
+      "file_attachment_urls": null,
+      "tools_triggered": "build_dataset, enrich, get_run, get_run_result, list_dataset_rows",
+      "expected_output": "Creates one dataset holding the three rows and two output columns, starts one fill run on it, and returns the three rows with their CEO and headquarters values or a clear terminal status.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Research a current topic and inspect a relevant public webpage.",
+      "user_prompt": "Search for recent public news about Riveter, then scrape the Riveter homepage and summarize the most relevant findings with source URLs.",
+      "file_attachment_urls": null,
+      "tools_triggered": "quick_search, scrape",
+      "expected_output": "Returns relevant web-search results and webpage content, then summarizes only information supported by the retrieved sources.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Discover, run, and retrieve a structured extraction from a public test site.",
+      "user_prompt": "Create an extraction for https://quotes.toscrape.com/ that returns each quote and author, wait until the extraction is ready, run it, and show me the first records.",
+      "file_attachment_urls": null,
+      "tools_triggered": "create_extraction, get_extraction, run_extraction, get_run, get_run_result",
+      "expected_output": "Creates and polls an extraction plan, starts one extraction run after it is ready, and returns records containing quote and author fields.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Create, verify, and pause a recurring enrichment monitor.",
+      "user_prompt": "Using the demo enrichment named Company Research, create a daily monitor for 9:00 AM UTC without running it immediately, verify its schedule, and then pause it.",
+      "file_attachment_urls": null,
+      "tools_triggered": "list_enrichments, create_monitor, get_monitor, update_monitor",
+      "expected_output": "Creates one daily monitor for the demo enrichment, confirms the 9:00 AM UTC schedule, pauses it, and reports that it is disabled.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "Do not trigger Riveter for an unrelated calendar request.",
+      "user_prompt": "What meetings do I have tomorrow?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it has no calendar or scheduling-calendar access.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not trigger Riveter to send an email or external message.",
+      "user_prompt": "Send an email to my sales team announcing our new pricing.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should not be invoked because it cannot compose and send arbitrary email or messages to recipients.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Do not claim support for account administration.",
+      "user_prompt": "Revoke all my Riveter API keys, change my billing plan, and invite my teammate to the account.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "The app should explain that API key revocation, billing changes, and team invitations are unsupported and point to the Riveter app settings instead of invoking another Riveter tool as a substitute.",
+      "expected_output_url": null
+    }
+  ]
+}

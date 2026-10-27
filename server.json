@@ -1,0 +1,46 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.riveterhq/riveter-mcp",
+  "title": "Riveter",
+  "description": "MCP server for Riveter's enrichment, scraping, and monitoring API",
+  "repository": {
+    "url": "https://github.com/riveterhq/riveter-mcp",
+    "source": "github"
+  },
+  "websiteUrl": "https://docs.riveterhq.com/",
+  "version": "0.3.4",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.riveterhq.com/mcp",
+      "headers": [
+        {
+          "description": "Optional. Omit to sign in with OAuth. Or pass `Bearer <your Riveter API key>` (get one at https://app.riveterhq.com/settings/api)",
+          "isRequired": false,
+          "format": "string",
+          "isSecret": true,
+          "name": "Authorization"
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "riveter-mcp-server",
+      "version": "0.3.4",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Your Riveter API key (get one at https://app.riveterhq.com/settings/api)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "RIVETER_API_KEY"
+        }
+      ]
+    }
+  ]
+}
