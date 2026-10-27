@@ -8,7 +8,7 @@ One codebase ships three ways:
 | --- | --- | --- |
 | `github.com/riveterhq/riveter-mcp` | public source mirror of this directory (directories and awesome-lists link here) | `.github/workflows/publish-clients.yml` (`mcp-mirror` job) on push to `main` |
 | npm `riveter-mcp-server` | stdio server for `npx` | `.github/workflows/publish-clients.yml` on merge to `main` (by hand: `pnpm publish`) |
-| MCP Registry `io.github.CodyWatters/riveter` | `server.json`: hosted `remotes` (plus the npm package once its `mcpName` matches) | `mcp-publisher publish` |
+| MCP Registry `io.github.CodyWatters/riveter` | `server.json`: the npm package and the hosted `remotes` entry | `mcp-publisher publish` |
 
 The hosted server (`https://mcp.riveterhq.com/mcp`) deploys itself from the monorepo's
 `main` (Render `mcp-server`), independent of all three.
@@ -28,17 +28,16 @@ The hosted server (`https://mcp.riveterhq.com/mcp`) deploys itself from the mono
 ## Release checklist
 
 1. Bump the version in every place it appears (keep them equal): `package.json` `version`,
-   `server.json` `version` (and `packages[0].version` when `packages` is present),
-   `SERVER_VERSION` in `src/server.ts`.
+   `server.json` `version` and `packages[0].version`, `SERVER_VERSION` in `src/server.ts`.
+   `sdk/scripts/check-published-versions.mjs` fails CI when they disagree.
 2. Commit to the monorepo as usual (the mirror is derived from the monorepo's `main`).
 3. npm: `.github/workflows/publish-clients.yml` (`npm` job) publishes the package when the
    merged version is not on npm yet (`prepublishOnly` runs build + all tests, including
    spec-contract; `docs/releasing-api-clients.md`). By hand it is `cd mcp-server && pnpm publish`.
 
    The registry checks that the published package's `mcpName` equals `server.json`
-   `name`, so npm must go first. npm 0.3.4 carries `io.github.riveterhq/riveter-mcp`, so
-   `server.json` 0.3.4 lists `remotes` only. From the next npm release (`mcpName` is back
-   to `io.github.CodyWatters/riveter`), add the `packages` entry back to `server.json`.
+   `name`, so npm must go first: run step 5 only after `npm view riveter-mcp-server
+   version` shows the new version.
 4. Mirror: the same workflow's `mcp-mirror` job pushes one snapshot commit of this
    directory onto the mirror's `main` (`sdk/scripts/push-mirror-snapshot.sh`; the
    monorepo's commits never reach the mirror) and tags `vX.Y.Z` when the mirror lacks

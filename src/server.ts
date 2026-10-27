@@ -11,7 +11,7 @@ import {
   type SchemaNode,
 } from "./openapi-parser.js"
 
-export const SERVER_VERSION = "0.3.4"
+export const SERVER_VERSION = "0.3.5"
 
 export const DEFAULT_OPENAPI_SPEC_URL = "https://docs.riveterhq.com/openapi.yaml"
 export const DEFAULT_API_BASE_URL = "https://api.riveterhq.com/v1"

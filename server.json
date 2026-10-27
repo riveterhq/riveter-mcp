@@ -8,7 +8,7 @@
     "source": "github"
   },
   "websiteUrl": "https://docs.riveterhq.com/",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "remotes": [
     {
       "type": "streamable-http",
@@ -20,6 +20,25 @@
           "format": "string",
           "isSecret": true,
           "name": "Authorization"
+        }
+      ]
+    }
+  ],
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "riveter-mcp-server",
+      "version": "0.3.5",
+      "transport": {
+        "type": "stdio"
+      },
+      "environmentVariables": [
+        {
+          "description": "Your Riveter API key (get one at https://app.riveterhq.com/settings/api)",
+          "isRequired": true,
+          "format": "string",
+          "isSecret": true,
+          "name": "RIVETER_API_KEY"
         }
       ]
     }
