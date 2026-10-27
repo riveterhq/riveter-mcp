@@ -29,12 +29,12 @@ Env vars: stdio — `RIVETER_API_KEY` (required), `RIVETER_API_BASE_URL`, `RIVET
 
 1. Bump the version in three places: `package.json`, `server.json` (two fields), and `SERVER_VERSION` in `src/server.ts`. `sdk/scripts/check-published-versions.mjs` fails CI when they disagree or when `src/` changed without a bump.
 2. Merge to `main`. `.github/workflows/publish-clients.yml` (`npm` job) publishes the package when that version is not on npm yet — `prepublishOnly` runs build + all tests first; auth is npm trusted publishing (OIDC) or the `NPM_TOKEN` secret (`docs/releasing-api-clients.md`). Before merging, check the package's Trusted Publisher on npmjs.com is validated (not expired; a new one lasts 48 hours unpublished). Never publish from an agent (repo git rules); by hand it is `cd mcp-server && pnpm publish`.
-3. MCP registry (`server.json`) publishes are by hand with `mcp-publisher` (`mcp-publisher login github && mcp-publisher publish` from this directory); its `.mcpregistry_*` tokens are gitignored and must never be committed. `server.json` lists both the npm package and the hosted `remotes` entry.
+3. MCP registry (`server.json`) publishes are by hand with `mcp-publisher` (`mcp-publisher login github && mcp-publisher publish` from this directory); its `.mcpregistry_*` tokens are gitignored and must never be committed. `server.json` 0.3.4 lists only the hosted `remotes` entry (npm 0.3.4's `mcpName` names the abandoned `io.github.riveterhq/riveter-mcp`); add the npm `packages` entry back from the next npm release, whose `mcpName` is `io.github.CodyWatters/riveter` again.
 4. The hosted service deploys itself from `main` (Render, `autoDeployTrigger: commit`).
-5. The public source mirror `github.com/riveterhq/riveter-mcp` is the same workflow's `mcp-mirror` job (`git subtree split --prefix=mcp-server` force-pushed over the mirror's `main`, tagged `v<version>` when new; the same pattern as `sdk/go` → `riveter-go`). The registry name `io.github.riveterhq/riveter-mcp` and the one-time repo setup are by hand: [`PUBLISHING.md`](PUBLISHING.md).
+5. The public source mirror `github.com/riveterhq/riveter-mcp` is the same workflow's `mcp-mirror` job (one snapshot commit of this directory onto the mirror's `main` per change, `sdk/scripts/push-mirror-snapshot.sh`, tagged `v<version>` when new; the monorepo's commits never reach the mirror). The registry name is `io.github.CodyWatters/riveter`, permanently (it owns the hosted URL in the registry; the move to `io.github.riveterhq/riveter-mcp` was refused). The one-time repo setup is by hand: [`PUBLISHING.md`](PUBLISHING.md).
 
 ## How to regenerate
 
 Rebuild from: `package.json`, `Dockerfile`, `src/server.ts`, `src/index.ts`, `src/http.ts`, `src/openapi-parser.ts`, `test/`, `../render.yaml` (`mcp-server` service), `../Procfile.dev` (`mcp_server`), `../public/api_docs/openapi.yaml`, `../public/api_docs/openapi.legacy.yaml`.
 
-Last verified: 2026-10-23
+Last verified: 2026-10-27

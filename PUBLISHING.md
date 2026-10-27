@@ -8,7 +8,7 @@ One codebase ships three ways:
 | --- | --- | --- |
 | `github.com/riveterhq/riveter-mcp` | public source mirror of this directory (directories and awesome-lists link here) | `.github/workflows/publish-clients.yml` (`mcp-mirror` job) on push to `main` |
 | npm `riveter-mcp-server` | stdio server for `npx` | `.github/workflows/publish-clients.yml` on merge to `main` (by hand: `pnpm publish`) |
-| MCP Registry `io.github.riveterhq/riveter-mcp` | `server.json`: hosted `remotes` + the npm package | `mcp-publisher publish` |
+| MCP Registry `io.github.CodyWatters/riveter` | `server.json`: hosted `remotes` (plus the npm package once its `mcpName` matches) | `mcp-publisher publish` |
 
 The hosted server (`https://mcp.riveterhq.com/mcp`) deploys itself from the monorepo's
 `main` (Render `mcp-server`), independent of all three.
@@ -20,41 +20,39 @@ The hosted server (`https://mcp.riveterhq.com/mcp`) deploys itself from the mono
    build datasets, scrape and search the web from Claude, ChatGPT, Cursor". Website:
    `https://docs.riveterhq.com`. Topics: `mcp`, `mcp-server`, `model-context-protocol`,
    `data-enrichment`, `web-scraping`.
-2. Make your riveterhq org membership **public** (github.com/orgs/riveterhq/people →
-   your row → Public). `mcp-publisher` only grants the `io.github.riveterhq/*` namespace
-   to public members.
-3. Install the publisher: `brew install mcp-publisher`.
+2. Install the publisher: `brew install mcp-publisher`.
 4. The workflow's `MIRROR_PUSH_TOKEN` secret must cover `riveter-mcp`
    (`docs/releasing-api-clients.md`, "One-time setup"); the `mcp-mirror` job fails with
    `403` until it does.
 
 ## Release checklist
 
-1. Bump the version in four places (keep them equal): `package.json` `version`,
-   `server.json` `version` and `packages[0].version`, `SERVER_VERSION` in `src/server.ts`.
+1. Bump the version in every place it appears (keep them equal): `package.json` `version`,
+   `server.json` `version` (and `packages[0].version` when `packages` is present),
+   `SERVER_VERSION` in `src/server.ts`.
 2. Commit to the monorepo as usual (the mirror is derived from the monorepo's `main`).
 3. npm: `.github/workflows/publish-clients.yml` (`npm` job) publishes the package when the
    merged version is not on npm yet (`prepublishOnly` runs build + all tests, including
    spec-contract; `docs/releasing-api-clients.md`). By hand it is `cd mcp-server && pnpm publish`.
 
    The registry checks that the published package's `mcpName` equals `server.json`
-   `name`, so npm must go first.
-4. Mirror: the same workflow's `mcp-mirror` job force-pushes
-   `git subtree split --prefix=mcp-server` over the mirror's `main` and tags `vX.Y.Z`
-   when the mirror lacks that tag. By hand, from the monorepo root:
+   `name`, so npm must go first. npm 0.3.4 carries `io.github.riveterhq/riveter-mcp`, so
+   `server.json` 0.3.4 lists `remotes` only. From the next npm release (`mcpName` is back
+   to `io.github.CodyWatters/riveter`), add the `packages` entry back to `server.json`.
+4. Mirror: the same workflow's `mcp-mirror` job pushes one snapshot commit of this
+   directory onto the mirror's `main` (`sdk/scripts/push-mirror-snapshot.sh`; the
+   monorepo's commits never reach the mirror) and tags `vX.Y.Z` when the mirror lacks
+   that tag. By hand, from the monorepo root on `main`:
 
    ```bash
-   git subtree split --prefix=mcp-server -b riveter-mcp-sync
-   git push --force git@github.com:riveterhq/riveter-mcp.git riveter-mcp-sync:main
-   git tag vX.Y.Z riveter-mcp-sync
-   git push git@github.com:riveterhq/riveter-mcp.git vX.Y.Z
-   git tag -d vX.Y.Z && git branch -D riveter-mcp-sync
+   commit=$(sdk/scripts/push-mirror-snapshot.sh mcp-server git@github.com:riveterhq/riveter-mcp.git "riveter-mcp-server X.Y.Z")
+   git push git@github.com:riveterhq/riveter-mcp.git "${commit}:refs/tags/vX.Y.Z"
    ```
 
 5. MCP Registry, from `mcp-server/`:
 
    ```bash
-   mcp-publisher login github     # browser device flow; tokens land in .mcpregistry_* (gitignored)
+   mcp-publisher login github     # browser device flow; covers io.github.CodyWatters/*; tokens land in .mcpregistry_* (gitignored)
    mcp-publisher publish
    ```
 
@@ -62,11 +60,14 @@ The hosted server (`https://mcp.riveterhq.com/mcp`) deploys itself from the mono
 
    ```bash
    npm view riveter-mcp-server version mcpName
-   curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=io.github.riveterhq/riveter-mcp" | jq '.servers[].server | {name, version}'
+   curl -s "https://registry.modelcontextprotocol.io/v0/servers?search=io.github.CodyWatters/riveter" | jq '.servers[].server | {name, version}'
    ```
 
-## Registry name history
+## Registry name
 
-Versions up to 0.3.3 used `io.github.CodyWatters/riveter` and were never published to the
-registry. 0.3.4 moved to `io.github.riveterhq/riveter-mcp` to match the mirror repo.
-Never change the name again after the first registry publish: directories key on it.
+The registry name is `io.github.CodyWatters/riveter`, permanently. Directories key on it,
+and the registry lets only one name own `https://mcp.riveterhq.com/mcp`. 0.3.4 tried to
+move to `io.github.riveterhq/riveter-mcp`, which failed with "remote URL ... is already used
+by server io.github.CodyWatters/riveter" (2026-10-27). Deprecating the old entry does not free
+the URL; only registry maintainers can. npm `riveter-mcp-server@0.3.4` is the one release
+whose `mcpName` says `io.github.riveterhq/riveter-mcp`.
