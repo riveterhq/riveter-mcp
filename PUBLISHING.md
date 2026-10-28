@@ -1,6 +1,8 @@
 # Publishing riveter-mcp-server
 
-User-run only — never push or publish from an agent (see the repo git rules).
+The workflow publishes npm and the mirror on merge. The by-hand steps (`pnpm publish`, the
+mirror push, `mcp-publisher publish`) use the engineer's own logins and are the engineer's
+steps, not an agent's (`.cursor/rules/general.mdc` "Steps only the user can run").
 
 One codebase ships three ways:
 
@@ -30,7 +32,7 @@ The hosted server (`https://mcp.riveterhq.com/mcp`) deploys itself from the mono
 1. Bump the version in every place it appears (keep them equal): `package.json` `version`,
    `server.json` `version` and `packages[0].version`, `SERVER_VERSION` in `src/server.ts`.
    `sdk/scripts/check-published-versions.mjs` fails CI when they disagree.
-2. Commit to the monorepo as usual (the mirror is derived from the monorepo's `main`).
+2. Commit to the monorepo as usual and merge through a PR (the mirror is derived from the monorepo's `main`).
 3. npm: `.github/workflows/publish-clients.yml` (`npm` job) publishes the package when the
    merged version is not on npm yet (`prepublishOnly` runs build + all tests, including
    spec-contract; `docs/releasing-api-clients.md`). By hand it is `cd mcp-server && pnpm publish`.
