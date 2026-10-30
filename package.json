@@ -1,6 +1,6 @@
 {
   "name": "riveter-mcp-server",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "mcpName": "io.github.CodyWatters/riveter",
   "description": "MCP server for the Riveter API — connects Claude to Riveter's enrichment, scraping, and monitoring tools",
   "homepage": "https://docs.riveterhq.com",

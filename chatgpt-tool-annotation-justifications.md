@@ -2,7 +2,7 @@
 
 Paste-ready text for the "Describe why ... is set to ..." fields in the OpenAI plugin submission portal (Scan Tools step). One block per tool; the line after each label is the value to copy.
 
-Source of truth for the values: `openWorldHint` = `x-mcp-open-world` in `public/api_docs/openapi.yaml` (11 operations: the 7 that accept a webhook URL plus the 4 that read the public web); `destructiveHint` = `x-mcp-destructive` or a `DELETE` method (`stop_run`, `update_enrichment`, `delete_enrichment`, `update_dataset`, `delete_dataset`, `delete_dataset_rows`, `update_dataset_row`, `promote_dataset_column`); `readOnlyHint` = `GET` (and the MCP-only `help` tool). 39 tools: the 38 operations of the spec plus `help`. `chatgpt-app-submission.json` carries the same values; when the spec's flags change, update both files together.
+Source of truth for the values: `openWorldHint` = `x-mcp-open-world` in `public/api_docs/openapi.yaml` (11 operations: the 7 that accept a webhook URL plus the 4 that read the public web); `destructiveHint` = `x-mcp-destructive` or a `DELETE` method (`stop_run`, `update_enrichment`, `delete_enrichment`, `update_dataset`, `delete_dataset`, `delete_dataset_rows`, `update_dataset_row`, `promote_dataset_column`); `readOnlyHint` = `GET` (and the MCP-only `help` tool). 40 tools: the 39 operations of the spec plus `help`. `chatgpt-app-submission.json` carries the same values; when the spec's flags change, update both files together.
 
 Definitions used (MCP spec): read-only = does not modify its environment; open-world = may interact with external entities outside Riveter (the public web or a caller-supplied webhook endpoint); destructive = may perform irreversible updates or deletes.
 
@@ -245,6 +245,20 @@ Reads from the user's own Riveter account only; contacts no external system.
 Destructive (False)
 
 Read-only lookup; cannot modify or delete.
+
+## get_dataset_summary
+
+Read Only (True)
+
+Counts a dataset's cells by state and its most common values per column. No state changes, no credits.
+
+Open World (False)
+
+Reads from the user's own Riveter account only; contacts no external system.
+
+Destructive (False)
+
+Read-only aggregate; cannot modify or delete.
 
 ## add_dataset_rows
 

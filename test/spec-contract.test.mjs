@@ -17,12 +17,12 @@ import { InMemoryTransport } from "@modelcontextprotocol/sdk/inMemory.js"
 //   description that grows by more than that fails here and is trimmed on purpose
 //   (names + descriptions + schemas + annotations). Re-measure after a spec change
 //   that adds or removes an operation and set the ceiling again: measured + 2K.
-//     openapi.yaml         74,929 chars on 2026-10-23 (39 tools incl. help) ≈ 19K tokens
+//     openapi.yaml         79,032 chars on 2026-10-30 (40 tools incl. help) ≈ 20K tokens
 //     openapi.legacy.yaml  80,617 chars on 2026-10-23 (31 tools, opt-in via RIVETER_OPENAPI_URL)
 //   one help topic 9000 chars ≈ 2.5K tokens (loaded only when the agent calls `help`)
 const INSTRUCTIONS_MAX_CHARS = 850
 const TOOL_DESCRIPTION_MAX_CHARS = 6000
-const TOOLS_LIST_MAX_CHARS = 77_000
+const TOOLS_LIST_MAX_CHARS = 81_000
 const LEGACY_TOOLS_LIST_MAX_CHARS = 83_000
 const HELP_TOPIC_MAX_CHARS = 9000
 

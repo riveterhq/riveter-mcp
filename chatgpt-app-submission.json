@@ -212,6 +212,18 @@
         "destructive_justification": "Does not modify or remove any listed row."
       }
     },
+    "get_dataset_summary": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Only counts a dataset's cells by state and its most common values per column; reads no rows into the response and changes nothing.",
+        "open_world_justification": "Reads from the user's own Riveter account only; contacts no external system.",
+        "destructive_justification": "Read-only aggregate; cannot modify or delete."
+      }
+    },
     "add_dataset_rows": {
       "annotations": {
         "readOnlyHint": false,

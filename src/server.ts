@@ -11,7 +11,7 @@ import {
   type SchemaNode,
 } from "./openapi-parser.js"
 
-export const SERVER_VERSION = "0.3.5"
+export const SERVER_VERSION = "0.3.6"
 
 export const DEFAULT_OPENAPI_SPEC_URL = "https://docs.riveterhq.com/openapi.yaml"
 export const DEFAULT_API_BASE_URL = "https://api.riveterhq.com/v1"
@@ -365,7 +365,8 @@ function registerOperation(server: McpServer, op: OpenApiOperation, config: Rive
           Object.keys(bodyParams).length > 0 ? bodyParams : undefined,
           Object.keys(headerParams).length > 0 ? headerParams : undefined,
         )
-        return textResult(JSON.stringify(result, null, 2))
+        // Compact: the text is for the model, and 2-space indentation was ~40% of a row listing.
+        return textResult(JSON.stringify(result))
       } catch (err) {
         return textResult(
           `API request failed: ${err instanceof Error ? err.message : String(err)}`,
