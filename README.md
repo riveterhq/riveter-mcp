@@ -67,13 +67,13 @@ Add the Riveter server:
 **Claude Code:**
 
 ```bash
-claude mcp add riveter --env RIVETER_API_KEY=sk_riv_your_key_here -- npx -y riveter-mcp-server
+claude mcp add riveter --env RIVETER_API_KEY=sk_riv_your_key_here -- npx -y --prefer-online riveter-mcp-server@latest
 ```
 
 **Codex:**
 
 ```bash
-codex mcp add riveter --env RIVETER_API_KEY=sk_riv_your_key_here -- npx -y riveter-mcp-server
+codex mcp add riveter --env RIVETER_API_KEY=sk_riv_your_key_here -- npx -y --prefer-online riveter-mcp-server@latest
 ```
 
 **Keeping the tools current:** the local server loads the API definition once, when your client starts it, and keeps that process running. After Riveter ships an API change, restart your AI client (or the MCP server from its settings page) to load the new tools. `--prefer-online riveter-mcp-server@latest` makes the same restart also pick up new server versions. The hosted server needs no restart; it reloads the API definition every 10 minutes.
@@ -86,7 +86,7 @@ Local (stdio) server — `dist/index.js`:
 | ---------------------- | -------- | ----------------------------------------- | -------------------- |
 | `RIVETER_API_KEY`      | Yes      | —                                         | Your Riveter API key |
 | `RIVETER_API_BASE_URL` | No       | `https://api.riveterhq.com/v1`            | API base URL         |
-| `RIVETER_OPENAPI_URL`  | No       | `https://docs.riveterhq.com/openapi.yaml` | OpenAPI spec URL. `https://docs.riveterhq.com/openapi.legacy.yaml` serves the legacy generation instead (verb endpoints, legacy enrichments, the retired list-build operations) |
+| `RIVETER_OPENAPI_URL`  | No       | `https://docs.riveterhq.com/openapi.yaml` | OpenAPI spec URL     |
 
 Hosted (Streamable HTTP) server — `dist/http.js`, deployed by Riveter:
 
@@ -107,7 +107,7 @@ On startup, the server:
 1. Fetches the OpenAPI spec from `docs.riveterhq.com/openapi.yaml`
 2. Parses each endpoint into an MCP tool with typed parameters and annotations (`readOnlyHint` from `GET`, `destructiveHint` from `DELETE` or the spec's `x-mcp-destructive`, `openWorldHint` from the spec's `x-mcp-open-world`)
 3. Uses the spec's `info.x-mcp-instructions` as the short server-level `instructions` (the long API overview stays on the docs site); an operation's `x-mcp-description` replaces its `description` for the tool when set
-4. Adds one `help` tool whose topics (column config, formats, tools, `run_when`, examples, credits, limits, errors, ...) come from the spec's `info.x-mcp-help` — long guidance is loaded only when the assistant asks for it
+4. Adds one `help` tool whose topics (column config, tools, examples, credits, limits, errors, ...) come from the spec's `info.x-mcp-help` — long guidance is loaded only when the assistant asks for it
 5. Serves the tools over stdio (local) or Streamable HTTP (hosted)
 
 When the API docs are updated, the local server picks up the changes the next time your assistant launches, and the hosted server re-fetches the spec every 10 minutes — no rebuild or republish needed.
