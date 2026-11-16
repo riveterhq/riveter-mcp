@@ -108,7 +108,7 @@ On startup, the server:
 2. Parses each endpoint into an MCP tool with typed parameters and annotations (`readOnlyHint` from `GET`, `destructiveHint` from `DELETE` or the spec's `x-mcp-destructive`, `openWorldHint` from the spec's `x-mcp-open-world`)
 3. Uses the spec's `info.x-mcp-instructions` as the short server-level `instructions` (the long API overview stays on the docs site); an operation's `x-mcp-description` replaces its `description` for the tool when set
 4. Adds one `help` tool whose topics (column config, tools, examples, credits, limits, errors, ...) come from the spec's `info.x-mcp-help` — long guidance is loaded only when the assistant asks for it
-5. Serves the tools over stdio (local) or Streamable HTTP (hosted)
+5. Serves the tools over stdio (local) or Streamable HTTP (hosted), with Riveter's name, website, and icon in the `initialize` reply for clients that show them
 
 When the API docs are updated, the local server picks up the changes the next time your assistant launches, and the hosted server re-fetches the spec every 10 minutes — no rebuild or republish needed.
 

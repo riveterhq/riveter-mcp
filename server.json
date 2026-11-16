@@ -8,7 +8,7 @@
     "source": "github"
   },
   "websiteUrl": "https://docs.riveterhq.com/",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "remotes": [
     {
       "type": "streamable-http",
@@ -28,7 +28,7 @@
     {
       "registryType": "npm",
       "identifier": "riveter-mcp-server",
-      "version": "0.3.6",
+      "version": "0.3.7",
       "transport": {
         "type": "stdio"
       },

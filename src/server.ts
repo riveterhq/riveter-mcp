@@ -10,8 +10,9 @@ import {
   type SchemaConstraints,
   type SchemaNode,
 } from "./openapi-parser.js"
+import { RIVETER_SERVER_ICONS } from "./server-icons.js"
 
-export const SERVER_VERSION = "0.3.6"
+export const SERVER_VERSION = "0.3.7"
 
 export const DEFAULT_OPENAPI_SPEC_URL = "https://docs.riveterhq.com/openapi.yaml"
 export const DEFAULT_API_BASE_URL = "https://api.riveterhq.com/v1"
@@ -414,7 +415,13 @@ function registerHelpTool(server: McpServer, helpTopics: Record<string, string>)
 // so the HTTP entrypoint creates one per request; stdio builds one for the process.
 export function buildMcpServer(config: RiveterMcpServerConfig): McpServer {
   const server = new McpServer(
-    { name: "riveter", version: SERVER_VERSION },
+    {
+      name: "riveter",
+      title: "Riveter",
+      version: SERVER_VERSION,
+      websiteUrl: "https://docs.riveterhq.com",
+      icons: RIVETER_SERVER_ICONS,
+    },
     { instructions: config.parsedSpec.instructions },
   )
 
