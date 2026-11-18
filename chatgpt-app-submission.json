@@ -476,6 +476,18 @@
         "destructive_justification": "Does not change any tool setting, enrichment, or account configuration."
       }
     },
+    "submit_feedback": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": false,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Sends a written report about the tools to the Riveter team, so it is not side-effect free.",
+        "open_world_justification": "The report goes to Riveter's own team only; it does not contact any public or third-party system on the user's behalf.",
+        "destructive_justification": "Adds a report; does not modify or delete anything in the account."
+      }
+    },
     "help": {
       "annotations": {
         "readOnlyHint": true,

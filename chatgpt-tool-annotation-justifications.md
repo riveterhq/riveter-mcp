@@ -2,7 +2,7 @@
 
 Paste-ready text for the "Describe why ... is set to ..." fields in the OpenAI plugin submission portal (Scan Tools step). One block per tool; the line after each label is the value to copy.
 
-Source of truth for the values: `openWorldHint` = `x-mcp-open-world` in `public/api_docs/openapi.yaml` (11 operations: the 7 that accept a webhook URL plus the 4 that read the public web); `destructiveHint` = `x-mcp-destructive` or a `DELETE` method (`stop_run`, `update_enrichment`, `delete_enrichment`, `update_dataset`, `delete_dataset`, `delete_dataset_rows`, `update_dataset_row`, `promote_dataset_column`); `readOnlyHint` = `GET` (and the MCP-only `help` tool). 40 tools: the 39 operations of the spec plus `help`. `chatgpt-app-submission.json` carries the same values; when the spec's flags change, update both files together.
+Source of truth for the values: `openWorldHint` = `x-mcp-open-world` in `public/api_docs/openapi.yaml` (11 operations: the 7 that accept a webhook URL plus the 4 that read the public web); `destructiveHint` = `x-mcp-destructive` or a `DELETE` method (`stop_run`, `update_enrichment`, `delete_enrichment`, `update_dataset`, `delete_dataset`, `delete_dataset_rows`, `update_dataset_row`, `promote_dataset_column`); `readOnlyHint` = `GET` (and the MCP-only `help` tool). 41 tools: the 40 operations of the spec plus `help`. `chatgpt-app-submission.json` carries the same values; when the spec's flags change, update both files together.
 
 Definitions used (MCP spec): read-only = does not modify its environment; open-world = may interact with external entities outside Riveter (the public web or a caller-supplied webhook endpoint); destructive = may perform irreversible updates or deletes.
 
@@ -553,6 +553,20 @@ Reads from the user's own Riveter account only; contacts no external system.
 Destructive (False)
 
 Read-only lookup; cannot modify or delete.
+
+## submit_feedback
+
+Read Only (False)
+
+Sends a written report about the tools to the Riveter team, so it is not side-effect free.
+
+Open World (False)
+
+The report goes to Riveter's own team only; contacts no public or third-party system on the user's behalf.
+
+Destructive (False)
+
+Adds a report; modifies or deletes nothing in the account.
 
 ## help
 
